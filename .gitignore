@@ -1,0 +1,13 @@
+# Segredos
+.env
+*.pem
+*.key
+
+# Python / Backend
+venv/
+__pycache__/
+*.py[cod]
+
+# Pastas de IDE e SO
+.vscode/
+.DS_Store
