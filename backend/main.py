@@ -9,7 +9,7 @@ from rq import Queue
 from dotenv import load_dotenv
 
 import worker_mercadolivre
-# Futuros workers serão importados aqui:
+import worker_kabum
 # import worker_amazon
 # import worker_shopee
 
@@ -79,13 +79,17 @@ async def disparar_robo(payload: dict):
     if not termo:
         raise HTTPException(status_code=400, detail="Digite um termo de busca")
         
-    # Limpeza inteligente: Transforma "Mercado Livre", " MERCADO LIVRE " em "mercadolivre"
-    site_formatado = str(site).lower().replace(" ", "").strip()
+    # Limpeza inteligente: Transforma "Mercado Livre" em "mercadolivre" e tira o "!" de "KaBuM!"
+    site_formatado = str(site).lower().replace(" ", "").replace("!", "").strip()
     
     # Roteador de Sites
     if site_formatado == "mercadolivre":
         job = q.enqueue(worker_mercadolivre.extrair_mercado_livre, termo)
-        return {"status": "🤖 Robô acionado para o Mercado Livre!", "job_id": job.get_id()}
+        return {"status": "🤖 Robô acionado para o Mercado Livre!", "job_id": job.id}
+        
+    elif site_formatado == "kabum":
+        job = q.enqueue(worker_kabum.extrair_kabum, termo)
+        return {"status": "🤖 Robô acionado para a KaBuM!", "job_id": job.id}
         
     elif site_formatado == "amazon":
         return {"status": "🤖 Em breve: Robô da Amazon será acionado!", "job_id": "futuro"}
